@@ -123,28 +123,35 @@ public class RouletteGUI extends JFrame {
 			public void run() {
 				for (double i = 0; i < Math.abs(moveLength); i++) {
 
-					if (isPositive) {
-						if (angle == 360)
-							angle = -1;
-						angle++;
-					} else {
-						if (angle == 0)
-							angle = 361;
-						angle--;
-					}
+					changeTheAngle();
+					delayDiskMovement(i);
+				}
+			}
 
-					int timeToSleep = 3;
-					if (i != 0) {
-						if (Math.abs(moveLength) / i > 0.99) {
-							timeToSleep = (int) (i * 10 / Math.abs(moveLength));
-						}
+			private void delayDiskMovement(double i) {
+				int timeToSleep = 3;
+				if (i != 0) {
+					if (Math.abs(moveLength) / i > 0.99) {
+						timeToSleep = (int) (i * 10 / Math.abs(moveLength));
 					}
+				}
 
-					try {
-						Thread.sleep(timeToSleep);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+				try {
+					Thread.sleep(timeToSleep);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+
+			private void changeTheAngle() {
+				if (isPositive) {
+					if (angle == 360)
+						angle = -1;
+					angle++;
+				} else {
+					if (angle == 0)
+						angle = 361;
+					angle--;
 				}
 			}
 		}
