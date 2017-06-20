@@ -39,8 +39,7 @@ public class RouletteGUI extends JFrame {
 		this.add(new RouletteDisk());
 
 		executor = new ScheduledThreadPoolExecutor(5);
-		executor.scheduleAtFixedRate(new Rotate(this), 0L, 20L,
-				TimeUnit.MILLISECONDS);
+		executor.scheduleAtFixedRate(new Rotate(this), 0L, 20L, TimeUnit.MILLISECONDS);
 
 		this.setVisible(true);
 
@@ -57,8 +56,7 @@ public class RouletteGUI extends JFrame {
 		public RouletteDisk() {
 			setOpaque(true);
 			try {
-				image = ImageIO.read(getClass().getResource(
-						"/image/roulette.png"));
+				image = ImageIO.read(getClass().getResource("/image/roulette.png"));
 
 				locationX = (BOARD_SIZE - image.getWidth()) / 2;
 				locationY = (BOARD_SIZE - image.getHeight()) / 2;
@@ -88,17 +86,11 @@ public class RouletteGUI extends JFrame {
 			at.translate(-image.getWidth() / 2, -image.getHeight() / 2);
 
 			graphics.drawImage(image, at, null);
-			System.out.println("Here Repaint");
 			graphics.setComposite(AlphaComposite.Src);
 
-			graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-					RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-			graphics.setRenderingHint(RenderingHints.KEY_RENDERING,
-					RenderingHints.VALUE_RENDER_QUALITY);
-			graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-					RenderingHints.VALUE_ANTIALIAS_ON);
-			// graphics.setPaint(Color.WHITE);
-			// graphics.fillRect(20, 20, 80, 50);
+			graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+			graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		}
 
 		public double getAngle() {
@@ -168,37 +160,53 @@ public class RouletteGUI extends JFrame {
 				if (isCorrectRange) {
 					endPositionY = e.getY();
 					endPositionX = e.getX();
+					if(checkIfInTheMiddle(endPositionX, endPositionY)){
+						return;
+					}
 					double moveY = endPositionY - startPositionY;
 					double moveX = endPositionX - startPositionX;
-					if(moveY == 0.0 && moveX == 0.0)
+					if (moveY == 0.0 && moveX == 0.0)
 						return;
-					boolean isPositive = isPositive(moveX, moveY,
-							startPositionX);
+					boolean isPositive = isClockwise(moveX, moveY, startPositionX, startPositionY);
 					double moveLength = calculateLength(moveX, moveY);
 					new Thread(new ChangeAngle(moveLength, isPositive)).start();
 				}
 			}
 
-			private double calculateLength(double moveX, double moveY) {
-				//        __________________
-				// |AB|= √(x2−x1)^2+(y2−y1)^2
-				return Math.sqrt(Math.abs(Math.pow(moveX, 2)
-						- Math.pow(moveY, 2)));
+			private boolean checkIfInTheMiddle(int endPositionX, int endPositionY) {
+				
+				return  Math.sqrt(Math.abs(Math.pow(endPositionX-300, 2) + Math.pow(endPositionY-300, 2))) < 90;
 			}
 
-			private boolean isPositive(double moveX, double moveY,
-					int startPositionX) {
+			private double calculateLength(double moveX, double moveY) {
+				// __________________
+				// |AB|= √(x2−x1)^2+(y2−y1)^2
+				return Math.sqrt(Math.abs(Math.pow(moveX, 2) + Math.pow(moveY, 2)));
+			}
+
+			private boolean isClockwise(double moveX, double moveY, int startPositionX, int startPositionY) {
 				boolean result;
-				if (startPositionX > BOARD_SIZE / 2) {
-					result = moveY > 0;
+				boolean isRightSide = startPositionX > BOARD_SIZE / 2;
+				boolean isDownSide = startPositionY > BOARD_SIZE / 2;
+				if (isRightSide) {
+					if (isDownSide) {
+						result = moveX < 0 && moveY >0;
+					} else {
+						result =  moveX > 0 || (moveY > 0 && moveX < 0);
+					}
 				} else {
-					result = moveY < 0;
+					if (isDownSide) {
+						result = moveX < 0 || (moveX >0 && moveY<0); 
+					} else {
+						result =  moveX > 0 || (moveX < 0 && moveY <0);
+					}
 				}
 				return result;
 			}
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				System.out.println(e.getX());
 			}
 
 			@Override
@@ -218,10 +226,8 @@ public class RouletteGUI extends JFrame {
 			}
 
 			private boolean clickedInsideRouletteDisk(MouseEvent e) {
-				boolean horizontally = e.getX() > locationX
-						&& e.getX() < locationX + image.getWidth();
-				boolean vertically = e.getY() > locationY
-						&& e.getY() < locationY + image.getHeight();
+				boolean horizontally = e.getX() > locationX && e.getX() < locationX + image.getWidth();
+				boolean vertically = e.getY() > locationY && e.getY() < locationY + image.getHeight();
 				isCorrectRange = horizontally && vertically;
 				return isCorrectRange;
 
