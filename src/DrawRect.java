@@ -1,5 +1,7 @@
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.TextField;
+
 import javax.swing.*;
 
 public class DrawRect extends JPanel {
@@ -27,6 +29,8 @@ public class DrawRect extends JPanel {
 
       JFrame frame = new JFrame("DrawRect");
       frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      mainPanel.add(new TextField("xyz"));
+      
       frame.getContentPane().add(mainPanel);
       frame.pack();
       frame.setLocationByPlatform(true);

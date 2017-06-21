@@ -1,23 +1,27 @@
 import java.awt.AlphaComposite;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
+@SuppressWarnings("serial")
 public class RouletteGUI extends JFrame {
 
 	private static final int BOARD_SIZE = 600;
@@ -35,8 +39,19 @@ public class RouletteGUI extends JFrame {
 		this.setTitle("Roulette");
 		this.setBackground(Color.BLACK);
 		this.setResizable(false);
+		
+		RouletteDisk disk = new RouletteDisk();
+		JPanel panel = new JPanel();
+		JLabel currentNumber = new JLabel(Double.toString(disk.getAngle()));
+		currentNumber.setHorizontalAlignment(SwingConstants.CENTER);
+		currentNumber.setVerticalAlignment(SwingConstants.TOP);
+		Font numberFont = new Font("Serif", Font.BOLD, 36);
+		currentNumber.setFont(numberFont);
+		panel.setLayout(new BorderLayout());
+		panel.add(disk,BorderLayout.CENTER);
+		this.add(panel);
 
-		this.add(new RouletteDisk());
+
 
 		executor = new ScheduledThreadPoolExecutor(5);
 		executor.scheduleAtFixedRate(new Rotate(this), 0L, 20L, TimeUnit.MILLISECONDS);
@@ -45,13 +60,13 @@ public class RouletteGUI extends JFrame {
 
 	}
 
-	@SuppressWarnings("serial")
 	private class RouletteDisk extends JComponent {
 		private BufferedImage image;
 		private double angle;
 
 		private int locationX;
 		private int locationY;
+		private int [] rouletteNumbers = new int [] {0, 26, 3, 35, 12, 28, 7, 29, 18, 22, 9, 31, 14, 20, 1, 33, 16, 24, 5, 10, 23, 8, 30, 11, 36, 13, 27, 6, 34, 17, 25, 2, 21, 4, 19, 15, 32}; 
 
 		public RouletteDisk() {
 			setOpaque(true);
@@ -79,7 +94,11 @@ public class RouletteGUI extends JFrame {
 		protected void paintComponent(Graphics g) {
 			super.paintComponent(g);
 			Graphics2D graphics = (Graphics2D) g;
-
+			Font numberFont = new Font("Serif", Font.BOLD, 60);
+			g.setColor(Color.ORANGE);		
+			g.setFont(numberFont);
+			char[] currentNumber = getNumberFromAngle(getAngle()).toCharArray();
+			graphics.drawChars(currentNumber, 0, currentNumber.length,BOARD_SIZE/2 -35,60);
 			AffineTransform at = new AffineTransform();
 			at.translate(getWidth() / 2, getHeight() / 2);
 			at.rotate(Math.toRadians(getAngle()));
@@ -87,19 +106,26 @@ public class RouletteGUI extends JFrame {
 
 			graphics.drawImage(image, at, null);
 			graphics.setComposite(AlphaComposite.Src);
-
 			graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 			graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			
+		
 		}
 
 		public double getAngle() {
 			return angle;
 		}
 
-		public void setAngle(double angle) {
-			this.angle = angle;
-
+		private String getNumberFromAngle(double angle){
+			
+			int result= 0;
+			if(angle != 0.0){
+				int index = (int) (angle/9.73);		
+				result = rouletteNumbers[index];				
+			}
+			
+			return Integer.toString(result);
 		}
 
 		class ChangeAngle implements Runnable {
