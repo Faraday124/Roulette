@@ -105,9 +105,9 @@ public class RouletteGUI extends JFrame {
 		protected void paintComponent(Graphics g) {
 			super.paintComponent(g);
 			Graphics2D graphics = (Graphics2D) g;
+			setGraphicsConfig(graphics);			
 			drawCurrentNumber(g, graphics);
 			drawDisk(graphics);
-			setGraphicsConfig(graphics);			
 			drawInformationSubtitle(g, graphics);		
 		}
 
@@ -115,6 +115,7 @@ public class RouletteGUI extends JFrame {
 			Font subtitleFont = new Font("Verdana", Font.ITALIC, 17);
 			g.setColor(Color.WHITE);
 			g.setFont(subtitleFont);
+			
 			String information = "Use your arrows <- -> to rotate"; 
 			graphics.drawChars(information.toCharArray(), 0, information.length() ,160 , 500);
 			
