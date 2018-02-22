@@ -78,7 +78,7 @@ public class RouletteGUI extends JFrame {
 			setOpaque(true);
 			try {
 				image = ImageIO.read(getClass().getResource(
-						"/image/roulette.png"));
+						"resources/image/roulette.png"));
 
 				locationX = (BOARD_SIZE - image.getWidth()) / 2;
 				locationY = (BOARD_SIZE - image.getHeight()) / 2;
